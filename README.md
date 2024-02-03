@@ -33,7 +33,7 @@ func main() {
     payload := map[string]interface{}{
 		"name":   "john doe",
 		"email":  "johndoe@test.com",
-		"amount": 1000 * 100,
+		"amount": float64(1000 * 100),
 	}
 
     // call the initialize method

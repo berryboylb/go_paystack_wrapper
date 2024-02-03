@@ -43,7 +43,7 @@ func (p *Paystack) Initialize(payload interface{}) (*PostResponseData, error) {
 	// Validate and extract 'amount' field
 	amount, amountExists := payloadMap["amount"].(float64)
 	if !amountExists {
-		return nil, errors.New("payload must contain 'amount' field")  
+		return nil, errors.New("payload must contain 'amount' field of type float64")  
 	}
 	if amount <= 0 {
 		return nil, errors.New("amount must be greater than zero") 
