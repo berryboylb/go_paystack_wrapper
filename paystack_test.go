@@ -92,11 +92,11 @@ var mockVerifyResponse = GetResponseData{
 }
 
 func TestInitialize(t *testing.T) {
-	p := NewPaystackClient("test-api-key")
+	p := NewPaystackClient("sk_test_5448a32a153654d798ec14afdfc16ec6a944fd99")
 	payload := map[string]interface{}{
 		"name":   "john doe",
 		"email":  "johndoe@test.com",
-		"amount": 1000 * 100,
+		"amount": float64(1000),
 	}
 	resp, err := p.Initialize(payload)
 	if err != nil {
@@ -128,7 +128,7 @@ func TestInitialize(t *testing.T) {
 }
 
 func TestVerify(t *testing.T) {
-	p := NewPaystackClient("test-api-key")
+	p := NewPaystackClient("sk_test_5448a32a153654d798ec14afdfc16ec6a944fd99")
 	resp, err := p.Verify("0l2qk643pk")
 	if err != nil {
 		t.Errorf("Expected no error, but got: %v", err)
