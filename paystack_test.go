@@ -1,10 +1,13 @@
 package paystack
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 	"time"
 )
+
+//run  `go test` to run tests and `go test -run TestFunction -v` for a single one
 
 // Mock response data for testing
 var mockInitializeResponse = PostResponseData{
@@ -136,4 +139,141 @@ func TestVerify(t *testing.T) {
 	if !reflect.DeepEqual(resp, &mockVerifyResponse) {
 		t.Errorf("Expected response to be: %v, but got: %v", mockVerifyResponse, resp)
 	}
+}
+
+
+
+func TestTransaction(t *testing.T) {
+	p := NewPaystackClient("api-key")
+	resp, err := p.ListTransactions(ListTransactions{
+		PerPage: 10,
+		Page:    1,
+	})
+	if err != nil {
+		t.Errorf("Expected no error, but got: %v", err)
+		return
+	}
+	if resp == nil {
+		t.Fatal("Expected a response, but got nil")
+		return
+	}
+	// Check that the response has the correct structure
+	if resp.Status != true || resp.Message == "" {
+		t.Errorf("Expected response to have 'Status' and 'Message', but got: %+v", resp)
+	}
+	fmt.Println("hello", resp.Meta)
+}
+
+var BanksResponse = &BankResponse{
+	Status:  true,
+	Message: "Banks retrieved",
+	Data: []Bank{
+		{
+			ID:               773,
+			Name:             "REHOBOTH MICROFINANCE BANK",
+			Slug:             "rehoboth-microfinance-bank-ng",
+			Code:             "50761",
+			Longcode:         "090463",
+			Gateway:          "",
+			PayWithBank:      false,
+			SupportsTransfer: true,
+			Active:           true,
+			Country:          "Nigeria",
+			Currency:         "NGN",
+			Type:             "nuban",
+			IsDeleted:        false,
+			CreatedAt:        "2024-02-02T08:58:01.000Z",
+			UpdatedAt:        "2024-02-02T08:58:01.000Z",
+		},
+		// Add more banks as needed
+	},
+	Meta: BankMeta{
+		Next:     "YmFuazo3NzE=",
+		Previous: "",
+		PerPage:  1,
+	},
+}
+
+func TestListBanks(t *testing.T) {
+	p := NewPaystackClient("api-key")
+	resp, err := p.ListBanks(FilterBanks{
+		PerPage:   1,
+		Country:   "nigeria",
+		UseCursor: "true",
+	})
+	if err != nil {
+		t.Errorf("Expected no error, but got: %v", err)
+		return
+	}
+	if resp == nil {
+		t.Fatal("Expected a response, but got nil")
+		return
+	}
+	// Check that the response has the correct structure
+	if resp.Status != true || resp.Message == "" {
+		t.Errorf("Expected response to have 'Status' and 'Message', but got: %+v", resp)
+	}
+	if !reflect.DeepEqual(resp, BanksResponse) {
+		t.Errorf("Expected response to be: %v, but got: %v", BanksResponse, resp)
+	}
+}
+
+func TestCreateRecipient(t *testing.T) {
+	p := NewPaystackClient("api-key")
+	resp, err := p.CreateRecipient(AccountDetails{
+		Type:          "nuban",
+		Name:          "OLURUNFEMI WINNER DARAMOLA",
+		AccountNumber: "0087476870",
+		BankCode:      "044",
+		Currency:      "NGN",
+		Description:   "test",
+	})
+	if err != nil {
+		t.Errorf("Expected no error, but got: %v", err)
+		return
+	}
+	if resp == nil {
+		t.Fatal("Expected a response, but got nil")
+		return
+	}
+	fmt.Println(resp.Data.RecipientCode)
+}
+
+func TestTransfer(t *testing.T) {
+	p := NewPaystackClient("api-key")
+	resp, err := p.Transfer(TransferInput{
+		Amount:    50 * 100,
+		Recipient: "RCP_c8y67uhuvl2xmws",
+		Reason:    "test",
+	})
+	if err != nil {
+		t.Errorf("Expected no error, but got: %v", err)
+		return
+	}
+	if resp == nil {
+		t.Fatal("Expected a response, but got nil")
+		return
+	}
+	fmt.Println(resp.Data.TransferCode)
+}
+
+func TestConfirmTransfer(t *testing.T) {
+	p := NewPaystackClient("api-key")
+	resp, err := p.ConfirmTransfer(ConfirmTransferInput{
+		TransferCode: "TRF_ivi6mjnpzx2ccfbd",
+		OTP:          "522839",
+	})
+	if err != nil {
+		t.Errorf("Expected no error, but got: %v", err)
+		return
+	}
+	if resp == nil {
+		t.Fatal("Expected a response, but got nil")
+		return
+	}
+	// Check that the response has the correct structure
+	if resp.Status != true || resp.Message == "" {
+		t.Errorf("Expected response to have 'Status' and 'Message', but got: %+v", resp)
+	}
+	fmt.Println(resp)
 }
